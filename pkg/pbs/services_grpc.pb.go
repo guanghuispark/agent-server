@@ -18,7 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DummyServiceClient interface {
-	GetHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	AgentInit(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
+	GetAgentConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error)
 }
 
 type dummyServiceClient struct {
@@ -29,9 +30,18 @@ func NewDummyServiceClient(cc grpc.ClientConnInterface) DummyServiceClient {
 	return &dummyServiceClient{cc}
 }
 
-func (c *dummyServiceClient) GetHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, "/pkg.pbs.DummyService/GetHello", in, out, opts...)
+func (c *dummyServiceClient) AgentInit(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
+	out := new(InitResponse)
+	err := c.cc.Invoke(ctx, "/pkg.pbs.DummyService/AgentInit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dummyServiceClient) GetAgentConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error) {
+	out := new(ConfigResponse)
+	err := c.cc.Invoke(ctx, "/pkg.pbs.DummyService/GetAgentConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +52,8 @@ func (c *dummyServiceClient) GetHello(ctx context.Context, in *HelloRequest, opt
 // All implementations must embed UnimplementedDummyServiceServer
 // for forward compatibility
 type DummyServiceServer interface {
-	GetHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	AgentInit(context.Context, *InitRequest) (*InitResponse, error)
+	GetAgentConfig(context.Context, *ConfigRequest) (*ConfigResponse, error)
 	mustEmbedUnimplementedDummyServiceServer()
 }
 
@@ -50,8 +61,11 @@ type DummyServiceServer interface {
 type UnimplementedDummyServiceServer struct {
 }
 
-func (UnimplementedDummyServiceServer) GetHello(context.Context, *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetHello not implemented")
+func (UnimplementedDummyServiceServer) AgentInit(context.Context, *InitRequest) (*InitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AgentInit not implemented")
+}
+func (UnimplementedDummyServiceServer) GetAgentConfig(context.Context, *ConfigRequest) (*ConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAgentConfig not implemented")
 }
 func (UnimplementedDummyServiceServer) mustEmbedUnimplementedDummyServiceServer() {}
 
@@ -66,20 +80,38 @@ func RegisterDummyServiceServer(s grpc.ServiceRegistrar, srv DummyServiceServer)
 	s.RegisterService(&DummyService_ServiceDesc, srv)
 }
 
-func _DummyService_GetHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+func _DummyService_AgentInit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DummyServiceServer).GetHello(ctx, in)
+		return srv.(DummyServiceServer).AgentInit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pkg.pbs.DummyService/GetHello",
+		FullMethod: "/pkg.pbs.DummyService/AgentInit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DummyServiceServer).GetHello(ctx, req.(*HelloRequest))
+		return srv.(DummyServiceServer).AgentInit(ctx, req.(*InitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DummyService_GetAgentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DummyServiceServer).GetAgentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pkg.pbs.DummyService/GetAgentConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DummyServiceServer).GetAgentConfig(ctx, req.(*ConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +124,12 @@ var DummyService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DummyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetHello",
-			Handler:    _DummyService_GetHello_Handler,
+			MethodName: "AgentInit",
+			Handler:    _DummyService_AgentInit_Handler,
+		},
+		{
+			MethodName: "GetAgentConfig",
+			Handler:    _DummyService_GetAgentConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -4,11 +4,16 @@ package pkg.pbs;
 option go_package = "github.com/codingpot/server-client-template-go/pkg/pbs";
 
 import "pkg/pbs/messages.proto";
-// please modify the messages, services below
-message HelloRequest { string body = 1; }
 
-message HelloResponse { string body = 1; }
+message InitRequest { string body = 1; }
+
+message InitResponse { string computeId = 1; }
+
+message ConfigRequest { string computeId = 1; }
+
+message ConfigResponse { uint32 capacity = 1; }
 
 service DummyService {
-  rpc GetHello(HelloRequest) returns (HelloResponse) {};
+  rpc AgentInit(InitRequest) returns (InitResponse) {};
+  rpc GetAgentConfig(ConfigRequest) returns (ConfigResponse) {};
 }
