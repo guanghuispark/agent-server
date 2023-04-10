@@ -23,7 +23,7 @@ func main() {
 	defer conn.Close()
 
 	c := pbs.NewDummyServiceClient(conn)
-	initResponse, err := c.AgentInit(context.Background(), &pbs.InitRequest{publicIP: getClientIP()})
+	initResponse, err := c.AgentInit(context.Background(), &pbs.InitRequest{PublicIP: getInstanceIP()})
 
 	if err != nil {
 		log.Fatalf("Error when calling AgentInit: %s", err)
@@ -49,7 +49,7 @@ func executeAgent(port string) {
 	}
 }
 
-func getClientIP() string {
+func getInstanceIP() string {
 	resp, err := http.Get("http://metadata.tencentyun.com/meta-data/public-ipv4")
 	if err != nil {
 		fmt.Println(err)
@@ -62,4 +62,19 @@ func getClientIP() string {
 	}
 
 	return "Get public IP failed"
+}
+
+func getInstanceID() string {
+	resp, err := http.Get("http://metadata.tencentyun.com/meta-data/instance-id")
+	if err != nil {
+		fmt.Println(err)
+		return "Get instance id failed"
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		return string(body)
+	}
+
+	return "Get instance id failed"
 }
