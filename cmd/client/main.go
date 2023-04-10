@@ -50,7 +50,7 @@ func executeAgent(port string) {
 }
 
 func getInstanceIP() string {
-	resp, err := http.Get("http://metadata.tencentyun.com/meta-data/public-ipv4")
+	resp, err := http.Get("http://metadata.tencentyun.com/latest/meta-data/public-ipv4")
 	if err != nil {
 		fmt.Println(err)
 		return "Get public IP failed"
@@ -65,7 +65,7 @@ func getInstanceIP() string {
 }
 
 func getInstanceID() string {
-	resp, err := http.Get("http://metadata.tencentyun.com/meta-data/instance-id")
+	resp, err := http.Get("http://metadata.tencentyun.com/latest/meta-data/instance-id")
 	if err != nil {
 		fmt.Println(err)
 		return "Get instance id failed"
