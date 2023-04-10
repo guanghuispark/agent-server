@@ -3,16 +3,16 @@ package main
 import (
 	"context"
 	"log"
-
+	"os/exec"
+	"strconv"
 	"github.com/codingpot/server-client-template-go/pkg/pbs"
-
 	"google.golang.org/grpc"
 )
 
 func main() {
 
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.86.96.236:9000", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
@@ -34,5 +34,14 @@ func main() {
 	log.Printf("Response from server: %s", configResponse)
 	for i := 0; i < int(configResponse.Capacity); i++ {
 		log.Printf("Lunch agent: %d", 8082+i)
+		executeAgent(strconv.Itoa(8082+i))
+	}
+}
+
+func executeAgent(port string) {
+	cmd := exec.Command("./ugp_agent_d.exe", port)
+	err := cmd.Start()
+	if err != nil {
+		panic(err)
 	}
 }

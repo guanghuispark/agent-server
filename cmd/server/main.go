@@ -15,9 +15,9 @@ import (
 )
 
 func main() {
-	fmt.Printf("gRPC server is listening at 0.0.0.0:%s\n", "9000")
+	fmt.Printf("gRPC server is listening at 10.86.96.236:%s\n", "9000")
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", "9000"))
+	listener, err := net.Listen("tcp", fmt.Sprintf("10.86.96.236:%s", "9000"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
