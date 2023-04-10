@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os/exec"
 	"strconv"
+
 	"github.com/codingpot/server-client-template-go/pkg/pbs"
 	"google.golang.org/grpc"
 )
@@ -19,8 +23,7 @@ func main() {
 	defer conn.Close()
 
 	c := pbs.NewDummyServiceClient(conn)
-
-	initResponse, err := c.AgentInit(context.Background(), &pbs.InitRequest{Body: "I am ready"})
+	initResponse, err := c.AgentInit(context.Background(), &pbs.InitRequest{publicIP: getClientIP()})
 
 	if err != nil {
 		log.Fatalf("Error when calling AgentInit: %s", err)
@@ -33,8 +36,8 @@ func main() {
 	}
 	log.Printf("Response from server: %s", configResponse)
 	for i := 0; i < int(configResponse.Capacity); i++ {
-		log.Printf("Lunch agent: %d", 8082+i)
-		executeAgent(strconv.Itoa(8082+i))
+		log.Printf("Launch agent: %d", 8082+i)
+		executeAgent(strconv.Itoa(8082 + i))
 	}
 }
 
@@ -44,4 +47,19 @@ func executeAgent(port string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func getClientIP() string {
+	resp, err := http.Get("http://metadata.tencentyun.com/meta-data/public-ipv4")
+	if err != nil {
+		fmt.Println(err)
+		return "Get public IP failed"
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		return string(body)
+	}
+
+	return "Get public IP failed"
 }

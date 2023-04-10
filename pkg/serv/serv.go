@@ -13,6 +13,7 @@ type Server struct {
 
 func (s Server) AgentInit(ctx context.Context, in *pbs.InitRequest) (*pbs.InitResponse, error) {
 	fmt.Printf("[gRPC server] AgentInit func is called \n")
+	fmt.Printf(in.publicIP + "\n")
 	return &pbs.InitResponse{
 		ComputeId: "1234567",
 	}, nil

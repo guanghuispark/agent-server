@@ -5,7 +5,7 @@ option go_package = "github.com/codingpot/server-client-template-go/pkg/pbs";
 
 import "pkg/pbs/messages.proto";
 
-message InitRequest { string body = 1; }
+message InitRequest { string publicIP = 1; }
 
 message InitResponse { string computeId = 1; }
 
